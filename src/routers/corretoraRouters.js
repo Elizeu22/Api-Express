@@ -1,14 +1,17 @@
 import express from "express"
 import CorretoraController from "../controllers/corretora.js"
+import verificaJwt from "../token.js"
+
 
 
 const rotas = express.Router();
 
-rotas.get("/corretoras",CorretoraController.listarCorretora);
+
+rotas.get("/corretoras",verificaJwt,CorretoraController.listarCorretora);
 rotas.get("/corretoras/:cnpj",CorretoraController.listarCorretoraPorCNPJ);
 rotas.post("/corretoras",CorretoraController.cadastrarCorretora);
-rotas.put("/corretoras/:cnpj",CorretoraController.atualizarCorretora);
-rotas.delete("/corretoras/:cnpj",CorretoraController.deletarCorretora);
+rotas.put("/corretoras/:cnpj",verificaJwt,CorretoraController.atualizarCorretora);
+rotas.delete("/corretoras/:cnpj",verificaJwt,CorretoraController.deletarCorretora);
 
 
 export default rotas;

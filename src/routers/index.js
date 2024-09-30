@@ -3,6 +3,7 @@ import rotas from '../routers/corretoraRouters.js';
 
 
 
+
 const routes = (app) => {
     app.route("/").get((req, res) => res.status(200).send());
 
