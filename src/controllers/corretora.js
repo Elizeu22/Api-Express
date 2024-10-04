@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import corretora from '../models/corretora.js'
+import conexaoRabbitMQ from '../rabbitMQProducer.js'
+import conexaoConsumer from '../rabbitMQConsumer.js'
 
-import queue from '../rabbit-mq.js';
 
 class CorretoraController {
 
@@ -19,7 +20,7 @@ class CorretoraController {
     static async listarCorretoraPorCNPJ(req, res) {
         try {
             const idcnpj = req.params.cnpj;
-            const token = jwt.sign({idcnpj},process.env.SECRET,{expiresIn:600})
+            const token = jwt.sign({ idcnpj }, process.env.SECRET, { expiresIn: 600 })
             console.log(token);
             const listarCnpj = await corretora.find({ cnpj: `${idcnpj}` });
             res.status(200).json(listarCnpj);
@@ -39,10 +40,17 @@ class CorretoraController {
 
             if (verificaCnpj.length === 0) {
 
+
                 const novaCorretora = await corretora.create(req.body);
+
+                conexaoRabbitMQ.conexao(novaCorretora);
+
+
                 res.status(201).json({ message: "Cadastrado com sucesso", corretora: novaCorretora });
+
+                conexaoConsumer.conexaoConsumer(novaCorretora);
             }
-            else{
+            else {
                 res.status(500).json({ message: `falha ao cadastrar os dados CNPJ ja cadastrado,verifique se ja existe` });
             }
 
